@@ -8,9 +8,3 @@ bcrypt>=4.2
 python-multipart>=0.0.20
 httpx>=0.27
 pandas>=2.2
-# --- only needed for tests / experiments (safe to leave installed) ---
-numpy
-matplotlib
-psutil
-pytest
-mongomock>=4.1
