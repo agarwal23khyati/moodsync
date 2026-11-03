@@ -1,0 +1,44 @@
+services:
+  - type: web
+    name: moodsync-agents
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements-prod.txt
+    startCommand: python -m uvicorn agent_service:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3
+      - key: MONGO_URI
+        sync: false
+      - key: DB_NAME
+        value: moodsync
+      - key: INTERNAL_KEY
+        sync: false
+      - key: TZ_OFFSET_MIN
+        value: "330"
+
+  - type: web
+    name: moodsync-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements-prod.txt
+    startCommand: python -m uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.3
+      - key: MONGO_URI
+        sync: false
+      - key: DB_NAME
+        value: moodsync
+      - key: JWT_SECRET
+        generateValue: true
+      - key: INTERNAL_KEY
+        sync: false
+      - key: AGENT_URL
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: TZ_OFFSET_MIN
+        value: "330"

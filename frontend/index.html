@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f8f4ff" />
+  <meta name="description" content="MoodSync — your mood, your little life dashboard." />
+  <title>MoodSync ✿ your little life dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="v2.css" />
+  <script src="config.js"></script>
+  <script defer src="app.js"></script>
+  <script defer src="player.js"></script>
+  <script defer src="tasks.js"></script>
+  <script defer src="insights.js"></script>
+</head>
+<body>
+  <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+  <main id="auth-view" class="auth-layout">
+    <section class="auth-art">
+      <div class="brand brand-large"><span class="brand-mark">✿</span> MoodSync</div>
+      <div class="auth-art-copy"><p class="eyebrow">YOUR MOOD, YOUR LITTLE WORLD</p><h1>Make space for<br><em>every version</em><br>of you.</h1><p>One check-in. A softer plan for your day.</p></div>
+      <div class="float-note note-one">✦ today's vibe: becoming</div><div class="float-note note-two">♡ progress, not perfection</div>
+      <div class="orbit-orb orb-a">☁️</div><div class="orbit-orb orb-b">🌷</div><div class="orbit-orb orb-c">✨</div>
+    </section>
+    <section class="auth-panel">
+      <div class="mobile-brand brand"><span class="brand-mark">✿</span> MoodSync</div>
+      <div class="auth-heading"><p class="eyebrow">A LITTLE CHECK-IN WITH YOURSELF</p><h2 id="auth-title">Welcome to your corner</h2><p id="auth-subtitle">Sign in and let's make today feel a little more you.</p></div>
+      <div class="auth-tabs"><button class="auth-tab active" data-auth-tab="login">Log in</button><button class="auth-tab" data-auth-tab="signup">Create account</button></div>
+      <form id="auth-form" class="stack-form">
+        <label id="name-field" class="field hidden">Your name<input id="auth-name" autocomplete="name" placeholder="What should we call you?" /></label>
+        <label class="field">Email address<input id="auth-email" type="email" required autocomplete="email" placeholder="you@example.com" /></label>
+        <label class="field">Password<input id="auth-password" type="password" required minlength="6" autocomplete="current-password" placeholder="At least 6 characters" /></label>
+        <button class="btn btn-primary btn-full" type="submit" id="auth-submit">Let's go <span>↗</span></button>
+        <p class="form-message" id="auth-message" role="status"></p>
+      </form>
+      <p class="tiny-note" id="connection-note">Your data is stored securely in MongoDB.</p>
+    </section>
+  </main>
+
+  <div id="app-view" class="app-shell hidden">
+    <aside class="sidebar">
+      <a class="brand" href="#home" data-page="home"><span class="brand-mark">✿</span> MoodSync</a>
+      <div class="side-label">YOUR SPACE</div>
+      <nav class="main-nav" aria-label="Main navigation">
+        <button class="nav-link active" data-page="home"><span>⌂</span> Home <kbd>01</kbd></button>
+        <button class="nav-link" data-page="wardrobe"><span>♧</span> Outfit studio <kbd>02</kbd></button>
+        <button class="nav-link" data-page="tasks"><span>☑</span> To-do garden <kbd>03</kbd></button>
+        <button class="nav-link" data-page="music"><span>♫</span> Mood radio <kbd>04</kbd></button>
+        <button class="nav-link" data-page="food"><span>♡</span> Food & groceries <kbd>05</kbd></button>
+        <button class="nav-link" data-page="history"><span>◷</span> Mood journal <kbd>06</kbd></button>
+        <button class="nav-link" data-page="insights"><span>◔</span> Insights <kbd>07</kbd></button>
+      </nav>
+      <div class="sidebar-bottom"><div class="side-tip"><span>✦ tiny reminder</span><p>You don't have to do it all. Just the next little thing.</p></div><div class="profile-row"><div class="avatar" id="profile-avatar">K</div><div class="profile-text"><strong id="profile-name">Your space</strong><span id="profile-mode">MongoDB</span></div><button id="logout-btn" class="icon-btn" title="Log out">↗</button></div></div>
+    </aside>
+    <section class="workspace">
+      <header class="topbar"><div class="breadcrumbs"><span>My little world</span><b>/</b><strong id="page-label">Home</strong></div><div class="topbar-right"><span class="sync-status" id="sync-status"><i></i> Connecting to MongoDB…</span><button class="icon-btn theme-spark" id="spark-btn" title="A little encouragement">✧</button></div></header>
+      <div id="toast" class="toast" role="status"></div>
+      <section class="page active" id="page-home">
+        <div class="welcome-row"><div><p class="eyebrow" id="today-label">TUESDAY, OCTOBER 13</p><h1>Hey <span id="hello-name">you</span>, <em>you've got this.</em> <span class="wave">✿</span></h1><p class="muted">Let's make today feel a little more like you.</p></div><div class="streak-pill"><span>🔥</span><div><strong id="streak-count">0 day streak</strong><small>showing up counts</small></div></div></div>
+        <div class="hero-grid">
+          <article class="card mood-card"><div class="card-top"><div><p class="eyebrow">DAILY CHECK-IN</p><h2>How's your inner weather?</h2></div><span class="deco-star">✳</span></div><p class="muted">No wrong answers. Just notice where you are.</p><div class="mood-options" id="mood-options">
+            <button class="mood-option" data-mood="happy"><span>☀️</span><b>Happy</b><small>sunny skies</small></button><button class="mood-option" data-mood="energetic"><span>⚡</span><b>Energetic</b><small>full battery</small></button><button class="mood-option" data-mood="calm"><span>🌿</span><b>Calm</b><small>soft & steady</small></button><button class="mood-option" data-mood="low"><span>🌧️</span><b>Low</b><small>taking it slow</small></button>
+          </div><div class="mood-bottom"><label class="occasion-select">Today's occasion<select id="occasion-select"><option>Casual</option><option>Work</option><option>Party</option><option>Workout</option><option>Study</option><option>Rest day</option></select></label><button class="btn btn-primary" id="save-mood-btn">Save check-in <span>↗</span></button></div><p class="form-message" id="mood-message"></p></article>
+          <article class="card quote-card"><div class="quote-icon">❝</div><p class="eyebrow">A NOTE FOR YOU</p><h2 id="quote-text">You are allowed to grow at your own pace.</h2><p id="quote-subtext">Little by little is still forward.</p><button class="text-btn" id="new-quote-btn">Another little reminder ↗</button><div class="quote-flower">✿</div></article>
+        </div>
+        <div class="section-heading"><div><p class="eyebrow">YOUR DAY, GENTLY</p><h2>Little wins dashboard</h2></div><span class="soft-chip">made for real life ♡</span></div>
+        <div class="stats-grid"><article class="stat-card stat-lilac"><div class="stat-icon">☑</div><span>Tasks completed</span><strong id="stat-tasks">0 <small>/ 0</small></strong><div class="progress-track"><i id="task-progress"></i></div><p id="task-caption">Every tiny win counts.</p></article><article class="stat-card stat-peach"><div class="stat-icon">♡</div><span>Moods checked in</span><strong id="stat-moods">0</strong><p>Your feelings deserve a little space.</p><div class="stat-doodle">✳</div></article><article class="stat-card stat-mint"><div class="stat-icon">♧</div><span>Wardrobe pieces</span><strong id="stat-wardrobe">0</strong><p>Outfits start with what you own.</p><div class="stat-doodle">✧</div></article><article class="stat-card stat-blue"><div class="stat-icon">✦</div><span>Days showing up</span><strong id="stat-streak">0</strong><p>Consistency, but make it kind.</p><div class="stat-doodle">☁</div></article></div>
+        <div class="home-extra" id="home-extra"></div>
+        <div class="bottom-grid"><article class="card task-preview"><div class="section-heading compact"><div><p class="eyebrow">ONE STEP AT A TIME</p><h2>Today's little list</h2></div><button class="text-btn" data-page="tasks">See all ↗</button></div><div id="home-task-list" class="mini-task-list"><div class="empty-state">Add one small thing to get started ✿</div></div><form id="quick-task-form" class="quick-add"><input id="quick-task-input" placeholder="A tiny thing to do..." maxlength="160" required/><button class="btn btn-primary" type="submit">Add +</button></form></article><article class="card shortcuts-card"><p class="eyebrow">FOLLOW YOUR FEELING</p><h2>What do you need right now?</h2><div class="shortcut-list"><button data-page="wardrobe"><span class="shortcut-icon lavender">♧</span><span><b>An outfit idea</b><small>Get dressed for your vibe</small></span><i>↗</i></button><button data-page="music"><span class="shortcut-icon pink">♫</span><span><b>A little soundtrack</b><small>Find music for this mood</small></span><i>↗</i></button><button data-page="food"><span class="shortcut-icon green">♡</span><span><b>Something yummy</b><small>Plan food without the fuss</small></span><i>↗</i></button></div></article></div>
+      </section>
+      <section class="page" id="page-wardrobe"><div class="page-heading"><div><p class="eyebrow">YOUR PERSONAL STYLE CORNER</p><h1>Outfit <em>studio</em> ♧</h1><p class="muted">Shop your own wardrobe first. Your style, your rules.</p></div><span class="big-emoji">👗</span></div><div class="content-grid"><article class="card"><p class="eyebrow">ADD TO YOUR CLOSET</p><h2>New wardrobe piece</h2><form id="wardrobe-form" class="stack-form"><label class="field">Item name<input id="wardrobe-name" required maxlength="80" placeholder="e.g. lilac knit top" /></label><div class="two-fields"><label class="field">Category<select id="wardrobe-category"><option>Top</option><option>Bottom</option><option>Dress</option><option>Outerwear</option><option>Shoes</option><option>Accessory</option></select></label><label class="field">Main colour<input id="wardrobe-color" placeholder="e.g. lilac" maxlength="30" /></label></div><div class="two-fields"><label class="field">Style<select id="wardrobe-style"><option>Casual</option><option>Formal</option><option>Party</option><option>Sporty</option><option>Traditional</option></select></label><label class="field">Season<select id="wardrobe-season"><option>All season</option><option>Summer</option><option>Winter</option><option>Monsoon</option></select></label></div><label class="field">Photo <span class="optional">(optional)</span><input id="wardrobe-image" type="file" accept="image/*" /></label><button class="btn btn-primary" type="submit">Add to my closet ↗</button><p class="form-message" id="wardrobe-message"></p></form></article><article class="card outfit-card"><p class="eyebrow">VIBE-BASED OUTFIT PROMPT</p><h2>Let the mood style you</h2><p class="muted">A fun nudge using the pieces you've saved — not a fashion rulebook.</p><div id="outfit-suggestion" class="outfit-suggestion"><div class="outfit-illustration">👚<span>✧</span></div><p>Save a few pieces to get a little outfit prompt.</p></div><button id="generate-outfit" class="btn btn-secondary btn-full">Style my mood ✦</button></article></div><div class="section-heading"><div><p class="eyebrow">THE PIECES THAT FEEL LIKE YOU</p><h2>My closet <span id="wardrobe-count" class="count-bubble">0</span></h2></div><select id="wardrobe-filter" class="filter-select"><option value="All">All pieces</option><option>Top</option><option>Bottom</option><option>Dress</option><option>Outerwear</option><option>Shoes</option><option>Accessory</option></select></div><div id="wardrobe-grid" class="wardrobe-grid"></div></section>
+      <section class="page" id="page-tasks"><div class="page-heading"><div><p class="eyebrow">PRODUCTIVITY, WITHOUT THE PRESSURE</p><h1>To-do <em>garden</em> ☑</h1><p class="muted">Plant a task. Water it a little. Celebrate when it grows.</p></div><span class="big-emoji">🌱</span></div>
+        <article class="card focus-card" id="focus-card"></article>
+        <div class="task-layout"><article class="card task-main"><div class="section-heading compact"><div><p class="eyebrow">YOUR TASKS</p><h2>What's on your mind?</h2></div><span class="soft-chip" id="task-count-chip">0 tasks</span></div>
+          <form id="task-form" class="task-form-v2"><input id="task-input" required maxlength="160" placeholder="e.g. revise unit 3 for 20 minutes"/>
+            <div class="task-opts">
+              <label class="mini-field">Priority<select id="task-priority"><option value="high">High</option><option value="medium" selected>Medium</option><option value="low">Low</option></select></label>
+              <label class="mini-field">Effort<select id="task-effort"><option value="quick">Quick (under 15 min)</option><option value="medium" selected>Medium</option><option value="deep">Deep work</option></select></label>
+              <label class="mini-field">Category<input id="task-category" list="task-cat-list" value="General" maxlength="30"/><datalist id="task-cat-list"><option>General</option><option>Study</option><option>Work</option><option>Personal</option><option>Health</option><option>Home</option></datalist></label>
+              <label class="mini-field">Due<input id="task-due" type="date"/></label>
+              <button class="btn btn-primary" type="submit">Add +</button></div></form>
+          <div class="task-toolbar"><div class="task-filters"><button class="filter-btn active" data-task-filter="all">All</button><button class="filter-btn" data-task-filter="active">To do</button><button class="filter-btn" data-task-filter="today">Today</button><button class="filter-btn" data-task-filter="overdue">Overdue</button><button class="filter-btn" data-task-filter="completed">Done ✨</button></div>
+            <input id="task-search" type="search" placeholder="Search tasks…" aria-label="Search tasks"/>
+            <select id="task-sort" aria-label="Sort tasks"><option value="smart">Smart order</option><option value="due">Due date</option><option value="priority">Priority</option><option value="newest">Newest first</option></select></div>
+          <div id="task-cat-row" class="chip-row"></div>
+          <div id="task-list" class="task-list"></div>
+          <div class="task-foot"><span id="task-footnote" class="tiny-note"></span><button class="text-btn" id="clear-done-btn" type="button">Clear completed</button></div></article>
+          <aside class="card progress-card"><p class="eyebrow">A LITTLE PROGRESS</p><h2>Look at you go.</h2><div class="donut-wrap"><div class="donut" id="task-donut"><div><strong id="task-percent">0%</strong><small>complete</small></div></div></div><div class="progress-summary"><div><span class="dot dot-lilac"></span>Completed<strong id="completed-count">0</strong></div><div><span class="dot dot-peach"></span>Still growing<strong id="remaining-count">0</strong></div></div>
+            <p class="eyebrow" style="margin-top:20px">LAST 7 DAYS</p><div id="task-week" class="week-bars"></div>
+            <div class="encourage-box">🌷 <span id="task-encouragement">Start small. Your future self says thanks.</span></div></aside></div></section>
+      <section class="page" id="page-music"><div class="page-heading"><div><p class="eyebrow">A SOUNDTRACK FOR YOUR SOUL</p><h1>Mood <em>radio</em> ♫</h1><p class="muted">Press play and it plays right here. No tabs, no searching.</p></div><span class="big-emoji">🎧</span></div>
+        <div class="music-top"><article class="card now-card" id="now-card"></article>
+          <article class="card mood-pick-card"><p class="eyebrow">NOW TUNING IN</p><h2 id="music-vibe-title">A playlist for your current vibe</h2><p id="music-vibe-desc" class="muted">Pick a mood and find your soundtrack.</p>
+            <div class="music-mood-switch" id="music-mood-switch"><button data-pl-mood="happy">☀️ Happy</button><button data-pl-mood="energetic">⚡ Energy</button><button data-pl-mood="calm">🌿 Calm</button><button data-pl-mood="low">🌧️ Low</button></div>
+            <button class="btn btn-primary btn-full" id="pl-play-mood" data-pl="playmood">▶ Play this mood</button><p class="tiny-note" id="pl-status"></p></article></div>
+        <div class="section-heading"><div><p class="eyebrow">YOUR QUEUE</p><h2>Up next</h2></div><span class="soft-chip" id="pl-count">—</span></div>
+        <div id="pl-queue" class="pl-queue"></div>
+        <article class="card add-track-card"><p class="eyebrow">YOUR OWN MUSIC</p><h2>Add a song or playlist</h2><p class="muted">Paste a YouTube or Spotify link and it joins your mood radio, with the full song playing in the little player.</p>
+          <form id="add-track-form" class="stack-form"><label class="field">YouTube or Spotify link<input id="at-url" required maxlength="300" placeholder="https://www.youtube.com/watch?v=… or https://open.spotify.com/playlist/…"/></label>
+            <div class="two-fields"><label class="field">Title <span class="optional">(optional)</span><input id="at-title" maxlength="100"/></label><label class="field">Artist <span class="optional">(optional)</span><input id="at-artist" maxlength="100"/></label></div>
+            <div class="field">Fits these moods <span class="optional">(none selected = all moods)</span><div class="chip-row" id="at-moods"><button type="button" class="chip" data-at-mood="happy">☀️ Happy</button><button type="button" class="chip" data-at-mood="energetic">⚡ Energetic</button><button type="button" class="chip" data-at-mood="calm">🌿 Calm</button><button type="button" class="chip" data-at-mood="low">🌧️ Low</button></div></div>
+            <button class="btn btn-secondary" type="submit">Add to my music</button><p class="form-message" id="at-msg"></p></form>
+          <div id="my-tracks" class="chip-row"></div></article></section>
+      <section class="page" id="page-food"><div class="page-heading"><div><p class="eyebrow">GOOD FOOD, LESS OVERTHINKING</p><h1>Food & <em>groceries</em> ♡</h1><p class="muted">Keep a little pantry list and find an idea for your next meal.</p></div><span class="big-emoji">🥑</span></div><div class="food-layout"><article class="card"><p class="eyebrow">WHAT'S AT HOME?</p><h2>My grocery list</h2><form id="grocery-form" class="task-create"><input id="grocery-input" required maxlength="80" placeholder="e.g. paneer, tomatoes, rice"/><button class="btn btn-primary" type="submit">Add +</button></form><div id="grocery-list" class="grocery-list"></div><p class="tiny-note">Your grocery list is private to your account.</p></article><article class="card meal-card"><p class="eyebrow">A LITTLE MEAL INSPIRATION</p><h2>What sounds good?</h2><p class="muted">Filter by vibe and prep time. These are starter ideas you can customize.</p><div class="two-fields"><label class="field">Food mood<select id="recipe-mood"><option value="any">Anything cozy</option><option value="comfort">Comfort food</option><option value="fresh">Fresh & light</option><option value="quick">Quick bite</option><option value="spicy">Spicy mood</option></select></label><label class="field">Time available<select id="recipe-time"><option value="60">Any time</option><option value="15">15 minutes</option><option value="30">30 minutes</option></select></label></div></article></div><div class="section-heading"><div><p class="eyebrow">THE LITTLE RECIPE BOX</p><h2>Today's possibilities</h2></div></div><div id="recipe-grid" class="recipe-grid"></div></section>
+      <section class="page" id="page-history"><div class="page-heading"><div><p class="eyebrow">NOTICE YOUR OWN PATTERNS</p><h1>Mood <em>journal</em> ◷</h1><p class="muted">Not a scorecard. Just a gentle record of how life feels.</p></div><span class="big-emoji">📔</span></div><div class="history-stats"><article class="card history-big"><p class="eyebrow">YOUR CHECK-INS</p><strong id="history-total">0</strong><span>moments of checking in with yourself</span></article><article class="card history-big"><p class="eyebrow">MOST COMMON VIBE</p><strong id="history-top-mood">—</strong><span>the mood you logged most</span></article><article class="card history-big"><p class="eyebrow">CURRENT STREAK</p><strong id="history-streak">0 days</strong><span>showing up for yourself</span></article></div><div class="history-layout"><article class="card"><div class="section-heading compact"><div><p class="eyebrow">YOUR INNER WEATHER</p><h2>Recent check-ins</h2></div><span class="soft-chip">latest first</span></div><div id="mood-history-list" class="history-list"></div></article><article class="card mood-chart-card"><p class="eyebrow">A LITTLE PATTERN, NOT A LABEL</p><h2>Mood mix</h2><div id="mood-chart" class="mood-chart"></div><p class="tiny-note">Moods change. This is only a snapshot of the check-ins you've chosen to save.</p></article></div></section>
+      <section class="page" id="page-insights"><div class="page-heading"><div><p class="eyebrow">NOTICE THE PATTERNS</p><h1>Your <em>insights</em> ◔</h1><p class="muted">Descriptive, not diagnostic: what your check-ins, tasks and music say so far.</p></div><span class="big-emoji">📊</span></div><div id="insights-root"><div class="empty-state">Loading your patterns…</div></div></section>
+      <footer class="app-footer"><span>✿ MoodSync</span><span>made with a little softness & a lot of you</span></footer>
+    </section>
+  </div>
+  <div id="embed-panel" class="embed-panel hidden"><div class="embed-head"><span id="embed-title">Playing</span><button id="embed-close" class="icon-btn" aria-label="Close player">×</button></div><div id="embed-holder"></div></div>
+  <div id="player-dock" class="player-dock hidden">
+    <div class="dock-art" id="dock-art">♫</div>
+    <div class="dock-meta"><strong id="dock-title"></strong><span id="dock-artist"></span></div>
+    <div class="dock-controls"><button data-pl="prev" aria-label="Previous">⏮</button><button data-pl="toggle" class="dock-play" id="dock-play" aria-label="Play or pause">▶</button><button data-pl="next" aria-label="Next">⏭</button></div>
+    <div class="dock-progress"><span id="dock-cur">0:00</span><input id="dock-seek" type="range" min="0" max="100" value="0" step="0.1" aria-label="Seek"/><span id="dock-dur">0:30</span></div>
+    <input id="dock-vol" class="dock-vol" type="range" min="0" max="1" step="0.05" value="0.8" aria-label="Volume"/>
+    <button data-pl="like" class="dock-like" id="dock-like" aria-label="Fits my mood" title="Fits my mood">♡</button>
+    <button data-page="music" class="dock-open" aria-label="Open the music page">♫ Queue</button>
+  </div>
+  <div id="modal-root"></div>
+</body>
+</html>
