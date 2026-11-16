@@ -139,10 +139,10 @@ def styling_rank(items: list, mood: Optional[str], occasion: str, season: str, p
         its = [p[1] for p in parts]
         fams = sorted({color_family(i.get("color", "")) for i in its})
         out.append({"score": round(sc, 4), "item_ids": [str(i["id"]) for i in its],
-                    "items": [{"id": str(i["id"]), "name": i.get("name", ""), "category": i.get("category", ""),
-                               "color": i.get("color", ""), "style": i.get("style", ""),
+                    "items": [{"id": str(i["id"]), "name": i.get("name") or "", "category": i.get("category") or "",
+                               "color": i.get("color") or "", "style": i.get("style") or "",
                                "worn_count": int(i.get("worn_count") or 0)} for i in its],
-                    "reason": f"{'/'.join(dict.fromkeys(i.get('style','') for i in its))} for {occasion}"
+                    "reason": f"{'/'.join(dict.fromkeys((i.get('style') or '') for i in its))} for {occasion}"
                               + (f", {mood} mood" if mood else "") + f", {'/'.join(fams)} tones"})
     return out
 
