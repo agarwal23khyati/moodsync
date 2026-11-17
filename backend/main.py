@@ -126,13 +126,11 @@ app.add_middleware(CORSMiddleware, allow_origins=ORIGINS, allow_methods=["*"], a
 
 @app.get("/api/health")
 async def health():
-    db.command("ping")
-    agents_ok = True
-    try:
-        r = await app.state.http.get(f"{AGENT_URL}/health"); agents_ok = r.status_code == 200
-    except Exception: agents_ok = False
-    return {"status": "ok", "database": db.name, "agent_service": "up" if agents_ok else "DOWN"}
-
+    await run_in_threadpool(db.command, "ping")
+    if AGENT_MODE == "local": return {"status": "ok", "database": db.name, "agent_service": "up"}   # agents run inside this process
+    try: ok = (await app.state.http.get(f"{AGENT_URL}/health")).status_code == 200
+    except Exception: ok = False
+    return {"status": "ok", "database": db.name, "agent_service": "up" if ok else "DOWN"}
 
 # --- auth ---
 @app.post("/api/auth/signup")
@@ -166,13 +164,26 @@ def remove(col, uid, id_):
 
 
 # =====================================================================  COORDINATOR AGENT
+AGENT_MODE = os.getenv("AGENT_MODE", "local")     # "local" = agents run in-process (no 2nd service); "remote" = old HTTP mode
+
+
 async def call_agent(name: str, payload: dict) -> dict:
     t0 = time.perf_counter()
-    r = await app.state.http.post(f"{AGENT_URL}/agents/{name}", json=payload)
-    r.raise_for_status()
-    data = AGENT_MODELS[name].model_validate(r.json()).model_dump()   # schema check: counts as a mismatch if it fails
+    if AGENT_MODE == "local":
+        import agent_service as AS
+        fn = {"styling": AS.styling, "task": AS.task, "music": AS.music, "recipe": AS.recipe}[name]
+        raw = await run_in_threadpool(fn, AS.AgentRequest(**payload))
+    else:
+        for attempt in range(4):
+            try:
+                r = await app.state.http.post(f"{AGENT_URL}/agents/{name}", json=payload)
+                if r.status_code in (502, 503, 504) and attempt < 3: await asyncio.sleep(3 * (attempt + 1)); continue
+                r.raise_for_status(); raw = r.json(); break
+            except (httpx.TransportError, httpx.TimeoutException):
+                if attempt == 3: raise
+                await asyncio.sleep(3 * (attempt + 1))
+    data = AGENT_MODELS[name].model_validate(raw).model_dump()
     return {"name": name, "data": data, "ms": round((time.perf_counter() - t0) * 1000, 1)}
-
 
 async def dispatch(payload: dict, names=AGENTS) -> dict:
     t0 = time.perf_counter()

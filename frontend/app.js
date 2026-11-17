@@ -48,7 +48,7 @@
 
   const state = {user:null,mode:'cloud',page:'home',mood:null,occasion:'Casual',moodDraft:null,taskFilter:'all',musicMood:'happy',wardrobeFilter:'All',tasks:[],moods:[],wardrobe:[],groceries:[],feedback:{},selectedRecipe:null};
   let toastTimer;
-  async function api(path,{method='GET',json,form}={}){const h={};if(token)h.Authorization=`Bearer ${token}`;let body;if(json!==undefined){h['Content-Type']='application/json';body=JSON.stringify(json)}else if(form)body=form;let r;try{r=await fetch(`${API}/api${path}`,{method,headers:h,body})}catch{throw new Error('Cannot reach the MoodSync server. Is the backend running?')}if(r.status===204)return null;const d=await r.json().catch(()=>({}));if(!r.ok){const det=d.detail;throw new Error(typeof det==='string'?det:(Array.isArray(det)&&det[0]&&det[0].msg)||'Request failed')}return d}
+  async function api(path,{method='GET',json,form}={}){const h={};if(token)h.Authorization=`Bearer ${token}`;let body;if(json!==undefined){h['Content-Type']='application/json';body=JSON.stringify(json)}else if(form)body=form;let r;for(let i=0;;i++){try{r=await fetch(`${API}/api${path}`,{method,headers:h,body});if([502,503,504].includes(r.status)&&i<5){window.__waking&&window.__waking(true);await new Promise(z=>setTimeout(z,3000*(i+1)));continue}break}catch{if(i<5){window.__waking&&window.__waking(true);await new Promise(z=>setTimeout(z,3000*(i+1)));continue}throw new Error('Cannot reach the MoodSync server. Is the backend running?')}}window.__waking&&window.__waking(false);if(r.status===204)return null;const d=await r.json().catch(()=>({}));if(!r.ok){const det=d.detail;throw new Error(typeof det==='string'?det:(Array.isArray(det)&&det[0]&&det[0].msg)||'Request failed')}return d}
   const withPhoto=i=>{i.image_url=i.photo_id?`${API}/api/photos/${i.photo_id}?t=${encodeURIComponent(token)}`:'';return i};
   function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2800)}
   function escapeHtml(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -133,4 +133,18 @@
   });
   window.MS={api,state,toast,escapeHtml,$,$$,todayKey,getRows,navigate,moodMeta,renderHome,renderHomeStatsOnly,streakCount,get token(){return token}};
   boot();
+})();
+
+
+
+/* Wake a sleeping Render server on page open and explain the delay. */
+(function(){
+  const API=((window.MOODSYNC_CONFIG||{}).API_URL||'').replace(/\/$/,'');
+  let bar;
+  window.__waking=on=>{
+    if(on&&!bar){bar=document.createElement('div');bar.textContent='Waking up the server… this can take up to a minute the first time.';
+      bar.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;padding:8px;text-align:center;background:#fff3cd;color:#664d03;font:14px system-ui';document.body.appendChild(bar)}
+    if(!on&&bar){bar.remove();bar=null}
+  };
+  fetch(API+'/api/health').catch(()=>{});
 })();
